@@ -1,5 +1,4 @@
-import nest
-
+from calvin.runtime.north.plugins.nest import Nest
 from calvin.utilities.calvinlogger import get_logger
 
 _log = get_logger(__name__)
@@ -38,7 +37,7 @@ class NestIntegration(object):
         """
         login_success = False
         try:
-            self.nest = nest.Nest(username, password)
+            self.nest = Nest(username, password)
             self.check_login()
             login_success = True
 
@@ -72,6 +71,33 @@ class NestIntegration(object):
         self.check_login()
         return self.nest.structures
 
+    def list_devices(self):
+
+        """
+        Lists all devices owned by the current user
+        Returns: a list of structures
+
+        """
+        self.check_login()
+        return self.nest.devices
+
+    def list_devices_by_structure(self, structure_name):
+
+        """
+        Lists the devices in the given structure
+        Args:
+            structure_name:
+
+        Returns: the list of devices related to that structure
+
+        """
+        self.check_login()
+        structure = self.get_structure_by_name(structure_name)
+
+        if structure is None:
+            raise NotFoundException("Structure with %s name does not exist" % structure_name)
+        return structure.devices
+
     def get_structure_by_name(self, structure_name):
 
         """
@@ -82,7 +108,8 @@ class NestIntegration(object):
 
         """
         self.check_login()
-        return filter(lambda item: item.name == structure_name, self.nest.structures)
+        res = filter(lambda item: item.name == structure_name, self.nest.structures)
+        return next(iter(res), None)
 
     def get_device_by_name(self,deviceID):
 
@@ -112,12 +139,10 @@ class NestIntegration(object):
         self.check_login()
         device = self.get_device_by_name(deviceID)
 
-        try:
-            if device is None:
-                raise NotFoundException("Device name does not exist!")
-            return device.__getattribute__(proprety_name)
-        except Exception, ex:
-            _log.error(ex.message)
+        if device is None:
+            raise NotFoundException("Device with %s name does not exist!" % deviceID)
+        return device.__getattribute__(proprety_name)
+
 
 
 
