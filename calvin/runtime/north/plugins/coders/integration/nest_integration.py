@@ -79,7 +79,8 @@ class NestIntegration(object):
 
         """
         self.check_login()
-        return self.nest.devices
+        complete_list = [self.nest.devices, self.nest.protectdevices, self.nest.cameradevices]
+        return reduce(lambda first,second: first + second, complete_list)
 
     def list_devices_by_structure(self, structure_name):
 
@@ -96,7 +97,8 @@ class NestIntegration(object):
 
         if structure is None:
             raise NotFoundException("Structure with %s name does not exist" % structure_name)
-        return structure.devices
+        complete_list = [structure.devices, structure.protectdevices, structure.cameradevices]
+        return reduce(lambda first,second: first + second, complete_list)
 
     def get_structure_by_name(self, structure_name):
 

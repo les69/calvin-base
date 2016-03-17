@@ -784,158 +784,6 @@ class ProtectDevice(NestBase):
         return self._device['wired_or_battery']
 
 
-class Structure(NestBase):
-    @property
-    def _structure(self):
-        return self._nest_api._status['structure'][self._serial]
-
-    def _set_away(self, value, auto_away=False):
-        self._set('structure', {'away': AWAY_MAP[value],
-                                'away_timestamp': int(time.time()),
-                                'away_setter': int(auto_away)})
-
-    @property
-    def away(self):
-        return self._structure['away']
-
-    @away.setter
-    def away(self, value):
-        self._set_away(value)
-
-    @property
-    def country_code(self):
-        return self._structure['country_code']
-
-    @property
-    def devices(self):
-        return [Device(devid.split('.')[-1], self._nest_api,
-                       self._local_time)
-                for devid in self._structure['devices']]
-
-    @property
-    def protectdevices(self):
-        return [ProtectDevice(topazid.split('.')[-1], self._nest_api,
-                              self._local_time)
-                for topazid in self._nest_api._status['topaz']]
-
-    @property
-    def dr_reminder_enabled(self):
-        return self._structure['dr_reminder_enabled']
-
-    @property
-    def emergency_contact_description(self):
-        return self._structure['emergency_contact_description']
-
-    @property
-    def emergency_contact_type(self):
-        return self._structure['emergency_contact_type']
-
-    @property
-    def emergency_contact_phone(self):
-        return self._structure['emergency_contact_phone']
-
-    @property
-    def enhanced_auto_away_enabled(self):
-        return self._structure['topaz_enhanced_auto_away_enabled']
-
-    @property
-    def eta_preconditioning_active(self):
-        return self._structure['eta_preconditioning_active']
-
-    @property
-    def house_type(self):
-        return self._structure['house_type']
-
-    @property
-    def hvac_safety_shutoff_enabled(self):
-        return self._structure['hvac_safety_shutoff_enabled']
-
-    @property
-    def name(self):
-        return self._structure['name']
-
-    @name.setter
-    def name(self, value):
-        self._set('structure', {'name': value})
-
-    @property
-    def location(self):
-        return self._structure.get('location')
-
-    @property
-    def address(self):
-        return self._structure.get('street_address')
-
-    @property
-    def num_thermostats(self):
-        return self._structure['num_thermostats']
-
-    @property
-    def measurement_scale(self):
-        return self._structure['measurement_scale']
-
-    @property
-    def postal_code(self):
-        return self._structure['postal_code']
-
-    @property
-    def renovation_date(self):
-        return self._structure['renovation_date']
-
-    @property
-    def structure_area(self):
-        return self._structure['structure_area']
-
-    @property
-    def time_zone(self):
-        return self._structure['time_zone']
-
-    @property
-    def _wheres(self):
-        return self._nest_api._status['where'][self._serial]['wheres']
-
-    @property
-    def wheres(self):
-        ret = {w['name'].lower(): w['where_id'] for w in self._wheres}
-        ret.update({v: k for k, v in ret.items()})
-        return ret
-
-    @wheres.setter
-    def wheres(self, value):
-        self._set('where', {'wheres': value})
-
-    def add_where(self, name, ident=None):
-        name = name.lower()
-
-        if name in self.wheres:
-            return self.wheres[name]
-
-        name = ' '.join([n.capitalize() for n in name.split()])
-        wheres = copy.copy(self._wheres)
-
-        if ident is None:
-            ident = str(uuid.uuid4())
-
-        wheres.append({'name': name, 'where_id': ident})
-        self.wheres = wheres
-
-        return self.add_where(name)
-
-    def remove_where(self, name):
-        name = name.lower()
-
-        if name not in self.wheres:
-            return None
-
-        ident = self.wheres[name]
-
-        wheres = [w for w in copy.copy(self._wheres)
-                  if w['name'] != name and w['where_id'] != ident]
-
-        self.wheres = wheres
-        return ident
-
-
 class CameraDevice(NestBase):
     @property
     def _device(self):
@@ -1217,6 +1065,12 @@ class Structure(NestBase):
         return [ProtectDevice(topazid.split('.')[-1], self._nest_api,
                               self._local_time)
                 for topazid in self._nest_api._status['topaz']]
+
+    @property
+    def cameradevices(self):
+        return [CameraDevice(devid.split('.')[-1], self._nest_api,
+                              self._local_time)
+                for devid in self._nest_api._status['quartz']]
 
     @property
     def dr_reminder_enabled(self):
