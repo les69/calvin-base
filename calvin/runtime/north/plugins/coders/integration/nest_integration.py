@@ -145,6 +145,17 @@ class NestIntegration(object):
             raise NotFoundException("Device with %s name does not exist!" % deviceID)
         return device.__getattribute__(proprety_name)
 
+    def set_property(self, deviceID, property_name, value):
+
+        self.check_login()
+        device = self.get_device_by_name(deviceID)
+
+        if device is None:
+            raise NotFoundException("Device with %s name does not exist!" % deviceID)
+        device.__setattr__(property_name, value)
+        return True
+
+
 
 
 

@@ -33,6 +33,13 @@ _log = get_logger(__name__)
 #default timeout
 TIMEOUT=5
 
+def absolute_filename(filename):
+    """Test helper - get absolute name of file
+    @TODO: Possibly not the best way of doing this
+    """
+    import os.path
+    return os.path.join(os.path.dirname(__file__), filename)
+
 def get_local_ip():
     import socket
     return [(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close())
