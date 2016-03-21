@@ -97,6 +97,8 @@ def test_correct_set_device_property(app):
     device = '4A32'
     prop = 'name'
     nest.set_property(device, prop, test_val)
+
+    #this works only for the name property, the fastest to check
     assert nest.get_property(test_val, prop) == test_val
     #assert nest.get_property(device, prop) == test_val
 
