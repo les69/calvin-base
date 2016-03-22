@@ -1,7 +1,7 @@
 from calvin.actor.actor import Actor, ActionResult, condition, guard
 from calvin.utilities.calvinlogger import get_logger
 
-from runtime.south.plugins.media.defaultimpl.picamera import PiCamera
+from runtime.south.plugins.media.defaultimpl.calvinpicamera import PiCamera
 from utilities.utils import absolute_filename
 _log = get_logger(__name__)
 
