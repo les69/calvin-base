@@ -4,7 +4,7 @@ import datetime
 
 
 
-class PiCamera(object):
+class CalvinPiCamera(object):
 
     def __init__(self):
         self.camera = pi.PiCamera()

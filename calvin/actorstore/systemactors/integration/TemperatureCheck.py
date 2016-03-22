@@ -1,11 +1,19 @@
 from calvin.actor.actor import Actor, ActionResult, manage, condition, guard
 from calvin.runtime.north.plugins.coders.integration.nest_integration import NestIntegration
 import time
-from utilities.utils import absolute_filename
 import json as js
 from calvin.utilities.calvinlogger import get_logger
 
 _log = get_logger(__name__)
+
+def absolute_filename(filename):
+    """Test helper - get absolute name of file
+    @TODO: Possibly not the best way of doing this
+    """
+    import os.path
+    return os.path.join(os.path.dirname(__file__), filename)
+
+
 class TemperatureCheck(Actor):
 
     """
