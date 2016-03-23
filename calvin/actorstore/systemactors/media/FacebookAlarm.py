@@ -1,16 +1,14 @@
 from calvin.actor.actor import Actor, ActionResult, condition, guard
 from calvin.utilities.calvinlogger import get_logger
 
-from runtime.south.plugins.media.defaultimpl.calvinpicamera import PiCamera
-from utilities.utils import absolute_filename
+from runtime.south.plugins.media.defaultimpl.calvinpicamera import CalvinPiCamera
 _log = get_logger(__name__)
 
-class FaceDetect(Actor) :
+class FacebookAlarm(Actor):
     """
     Detect faces in a jpg-image
 
-    Inputs:
-        image: Image to analyze
+
     Outputs:
         faces: non-zero if face detected
     """
@@ -24,7 +22,7 @@ class FaceDetect(Actor) :
     def setup(self):
         self.timer = self['timer'].repeat(self.delay)
         self.use("calvinsys.media.image", shorthand="image")
-        self.camera = PiCamera()
+        self.camera = CalvinPiCamera()
         self.image = self["image"]
         self.picture = None
 
@@ -36,11 +34,11 @@ class FaceDetect(Actor) :
     def detect(self):
         found = self.image.detect_face(self.picture)
         _log.info('From FaceDetect found = %s' % found)
-        return ActionResult(production=(found, ))
+        return ActionResult(production=(self.picture, ))
 
     @condition([], [])
     @guard(lambda self, _: self.timer and self.timer.triggered)
-    def take_picture(self, token):
+    def take_picture(self):
         self.timer.ack()
         self.picture = self.camera.get_picture()
         return ActionResult()

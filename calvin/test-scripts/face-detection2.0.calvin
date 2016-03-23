@@ -1,0 +1,4 @@
+detector: media.FacebookAlarm()
+io : io.Print()
+
+detector.faces > io.token
