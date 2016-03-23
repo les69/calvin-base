@@ -2,6 +2,7 @@ from calvin.actor.actor import Actor, ActionResult, condition, guard
 from calvin.utilities.calvinlogger import get_logger
 import time
 from calvin.calvinsys.media.calvinpicamera import CalvinPiCamera
+from facebook_manager import FacebookPost,FacebookUser
 _log = get_logger(__name__)
 
 class FacebookAlarm(Actor):
@@ -12,13 +13,14 @@ class FacebookAlarm(Actor):
         faces: non-zero if face detected
     """
 
-    def init(self, delay=3):
+    def init(self, delay=1.5):
         self.delay = delay
         self.use('calvinsys.events.timer', shorthand='timer')
         self.timer = None
         self.setup()
 
     def setup(self):
+        self.fb = FacebookUser('config')
         self.timer = self['timer'].repeat(self.delay)
         self.use("calvinsys.media.image", shorthand="image")
         self.camera = CalvinPiCamera()
@@ -33,8 +35,13 @@ class FacebookAlarm(Actor):
     @condition([], ['faces'])
     @guard(lambda self: self.picture)
     def detect(self):
-        found = self.image.detect_face(open(self.picture))
+        pict = open(self.picture)
+        found = self.image.detect_face(pict)
         _log.info('From FaceDetect found = %s' % found)
+
+        if found:
+            self.fb.post_picture(self.picture, 'Hey look who \'s there')
+
         time.sleep(self.delay)
         self.picture = None
         return ActionResult(production=(self.picture, ))
@@ -44,6 +51,7 @@ class FacebookAlarm(Actor):
     def take_picture(self):
         _log.info('Taking a picture')
         self.picture = self.camera.get_picture()
+        time.sleep(self.delay)
         return ActionResult()
 
     action_priority = (take_picture, detect )
