@@ -1,7 +1,7 @@
 from calvin.actor.actor import Actor, ActionResult, condition, guard
 from calvin.utilities.calvinlogger import get_logger
 
-from runtime.south.plugins.media.defaultimpl.calvinpicamera import CalvinPiCamera
+from calvin.calvinsys.media.calvinpicamera import CalvinPiCamera
 _log = get_logger(__name__)
 
 class FacebookAlarm(Actor):

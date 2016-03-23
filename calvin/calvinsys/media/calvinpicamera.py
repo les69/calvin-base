@@ -3,7 +3,6 @@ import time
 import datetime
 
 
-
 class CalvinPiCamera(object):
 
     def __init__(self):
