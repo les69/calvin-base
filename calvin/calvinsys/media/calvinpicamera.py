@@ -1,7 +1,6 @@
 import picamera as pi
 import time
 import datetime
-from calvin.utilities.utils import absolute_filename
 
 class CalvinPiCamera(object):
 
@@ -12,4 +11,4 @@ class CalvinPiCamera(object):
         ts = time.time()
         pict_name = 'picture-%s.jpg' % datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         self.camera.capture(pict_name)
-        return absolute_filename(__file__, pict_name)
+        return pict_name

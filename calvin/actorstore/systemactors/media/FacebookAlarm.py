@@ -2,7 +2,7 @@ from calvin.actor.actor import Actor, ActionResult, condition, guard
 from calvin.utilities.calvinlogger import get_logger
 import time
 from calvin.calvinsys.media.calvinpicamera import CalvinPiCamera
-from facebook_manager import FacebookPost,FacebookUser
+from calvin.runtime.north.plugins.facebook.facebook_manager import FacebookUser
 _log = get_logger(__name__)
 
 class FacebookAlarm(Actor):
@@ -40,6 +40,7 @@ class FacebookAlarm(Actor):
         _log.info('From FaceDetect found = %s' % found)
 
         if found:
+            _log.info('Posting on user wall')
             self.fb.post_picture(self.picture, 'Hey look who \'s there')
 
         time.sleep(self.delay)
