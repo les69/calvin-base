@@ -1,0 +1,4 @@
+msg : std.Constant(data="ok")
+out : web.Facebook()
+
+msg.token > out.status
