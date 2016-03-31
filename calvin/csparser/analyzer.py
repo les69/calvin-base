@@ -28,6 +28,7 @@ def full_port_name(namespace, actor_name, port_name):
         return namespace + ':' + actor_name + '.' + port_name
     return namespace + '.' + port_name
 
+
 class Analyzer(object):
 
     """
@@ -51,8 +52,8 @@ class Analyzer(object):
         self.connections = {}
         self.actors = {}
         self.verify = verify
+        self.actorstore = ActorStore()
         self.analyze()
-
 
     def analyze(self):
         """
@@ -79,7 +80,9 @@ class Analyzer(object):
         except Exception as e:
             _log.exception(e)
             valid = False
-        self.app_info = {'valid':valid, 'actors': self.actors, 'connections':self.connections}
+        self.app_info = {'valid': valid, 'actors': self.actors, 'connections': self.connections}
+        if self.script_name:
+            self.app_info['name'] = self.script_name
 
     def debug_info(self, d):
         file = 'File "%s"' % self.script_name
@@ -96,7 +99,6 @@ class Analyzer(object):
             return (kind, value)
         return self.lookup_constant(value)
 
-
     def lookup(self, actor_type):
         """
         Search for the definition of 'actor_type'.
@@ -111,7 +113,7 @@ class Analyzer(object):
         if actor_type in self.local_components:
             compdef = self.local_components[actor_type]
             return compdef, False
-        found, is_actor, info = ActorStore().lookup(actor_type)
+        found, is_actor, info = self.actorstore.lookup(actor_type)
         if self.verify and not found:
             msg = 'Actor "{}" not found.'.format(actor_type)
             raise Exception(msg)
@@ -135,10 +137,16 @@ class Analyzer(object):
                 else:
                     kind, value = self.lookup_constant(value)
             # Replace constant with std.Constant(data=value, n=-1) its outport
-            name = '_literal_const_'+str(const_count)
+            name = '_literal_const_' + str(const_count)
             const_count += 1
             # Replace implicit actor with actual actor ...
-            structure['actors'][name] = {'actor_type':'std.Constant', 'args':{'data':(kind, value), 'n':('NUMBER', -1)}, 'dbg_line':c['dbg_line']}
+            structure['actors'][name] = {
+                'actor_type': 'std.Constant',
+                'args': {
+                    'data': (kind, value),
+                    'n': ('NUMBER', -1)
+                },
+                'dbg_line': c['dbg_line']}
             # ... and create a connection from it
             c['src'] = name
             c['src_port'] = 'token'
@@ -176,13 +184,12 @@ class Analyzer(object):
             # Add mapping from component inport to internal actors/components
             if type(dst_actor_port) is not list:
                 dst_actor_port = [dst_actor_port]
-            export_mapping = {src_actor_port:dst_actor_port}, {}
+            export_mapping = {src_actor_port: dst_actor_port}, {}
         else:
             # Add mapping from internal actor/component to component outport
-            export_mapping = {}, {dst_actor_port:src_actor_port}
+            export_mapping = {}, {dst_actor_port: src_actor_port}
 
         return export_mapping
-
 
     def analyze_structure(self, structure, namespace, argd):
         """
@@ -198,26 +205,26 @@ class Analyzer(object):
         out_mappings = {}
         for actor_name, actor_def in structure['actors'].iteritems():
             # Look up actor
-            info, is_actor= self.lookup(actor_def['actor_type'])
+            info, is_actor = self.lookup(actor_def['actor_type'])
             # Resolve arguments
             args = self.resolve_arguments(actor_def['args'], argd)
 
-            qualified_name = namespace+':'+actor_name
+            qualified_name = namespace + ':' + actor_name
 
             if is_actor:
                 # Create the actor signature to be able to look it up in the GlobalStore if neccessary
-                signature_desc={'is_primitive': True,
-                                'actor_type':actor_def['actor_type'],
-                                'inports': [],
-                                'outports': []}
+                signature_desc = {'is_primitive': True,
+                                  'actor_type': actor_def['actor_type'],
+                                  'inports': [],
+                                  'outports': []}
                 for c in structure['connections']:
-                    if actor_name == c['src'] and c['src_port'] not in signature_desc['inports']:
-                        signature_desc['inports'].append(c['src_port'])
-                    elif actor_name == c['dst'] and c['dst_port'] not in signature_desc['outports']:
-                        signature_desc['outports'].append(c['dst_port'])
+                    if actor_name == c['src'] and c['src_port'] not in signature_desc['outports']:
+                        signature_desc['outports'].append(c['src_port'])
+                    elif actor_name == c['dst'] and c['dst_port'] not in signature_desc['inports']:
+                        signature_desc['inports'].append(c['dst_port'])
                 signature = GlobalStore.actor_signature(signature_desc)
                 # Add actor and its arguments to the list of actor instances
-                self.actors[qualified_name] = {'actor_type':actor_def['actor_type'], 'args':args,
+                self.actors[qualified_name] = {'actor_type': actor_def['actor_type'], 'args': args,
                                                'signature': signature, 'signature_desc': signature_desc}
             else:
                 # Recurse into components
@@ -236,6 +243,7 @@ class Analyzer(object):
 
         return export_in_mappings, export_out_mappings
 
+
 def generate_app_info(cs_info, verify=True):
     a = Analyzer(cs_info, verify=verify)
     return a.app_info
@@ -252,11 +260,8 @@ if __name__ == '__main__':
         print "---------------"
         data, errors, warnings = cscompiler.compile(script, filename)
         if errors:
-            print "{reason} {script} [{line}:{col}]".format(script=filename, **error[0])
+            print "{reason} {script} [{line}:{col}]".format(script=filename, **errors[0])
 
         a = Analyzer(data)
         print "======= DONE ========"
         print json.dumps(a.app_info, indent=4, sort_keys=True)
-
-
-

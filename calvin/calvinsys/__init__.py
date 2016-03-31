@@ -25,7 +25,7 @@ class Sys(object):
 
         packages = pkgutil.walk_packages(path, name + '.')
         blacklist = _conf.get(None, 'capabilities_blacklist') or []
-        _log.analyze(node.id, "+ BLACKLIST", {'blacklist': blacklist})
+        _log.analyze(node.id if node else None, "+ BLACKLIST", {'blacklist': blacklist})
         for package in packages:
             if not package[2]:
                 (_, _, package_name) = package[1].partition(".")
@@ -46,6 +46,7 @@ class Sys(object):
         try:
             self.modules[modulename]['module'] = importlib.import_module(self.modules[modulename]['name'])
         except Exception as e:
+            _log.info("Module '%s' not available: %s" % (modulename, e))
             self.modules[modulename]['error'] = e
 
     def use_requirement(self, actor, modulename):
