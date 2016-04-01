@@ -48,8 +48,10 @@ class Facebook(Actor):
                               'picture': ''},
                'message': 'message_thisshouldwork'}
 
-        self['facebook'].post_update(msg)
+        #self['facebook'].post_update(msg)
+        pict = {'picture' : '/home/emirkomo/Pictures/setup.jpg', 'message' : 'test from calvin'}
+        self['facebook'].post_picture(pict)
         return ActionResult()
 
     action_priority = (post_update,)
-    requires = ['calvinsys.web.facebook_module']
+    requires = ['calvinsys.web.facebook']
