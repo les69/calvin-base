@@ -37,7 +37,7 @@ class Facebook(Actor):
         self.setup()
 
     def setup(self):
-        self.use('calvinsys.web.facebook_module', shorthand='facebook')
+        self.use('calvinsys.web.facebook', shorthand='facebook')
 
     @condition(action_input=['status'])
     def post_update(self, status):
@@ -49,7 +49,7 @@ class Facebook(Actor):
                'message': 'message_thisshouldwork'}
 
         #self['facebook'].post_update(msg)
-        pict = {'picture' : '/home/emirkomo/Pictures/setup.jpg', 'message' : 'test from calvin'}
+        pict = {'picture' : '/home/emirkomo/Pictures/setup.jpg', 'message' : 'test from calvin', 'album' :  '/test/photos'}
         self['facebook'].post_picture(pict)
         return ActionResult()
 

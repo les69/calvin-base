@@ -85,7 +85,7 @@ class FacebookUser(object):
             else:
                 _log.info("Skipping duplicate message '%s'" % message)
         except Exception as e:
-            _log.error('Failed to post message %s because of error: %s' % message, e.message)
+            _log.error('Failed to post message %s because of error: %s' % (message, e.message))
 
     def cb_picture_update(self, *args, **kwargs):
         if self._next_picture:
@@ -106,7 +106,7 @@ class FacebookUser(object):
             if album is None:
                 self._in_progress = threads.defer_to_thread(self.fb_user.put_photo, image=fb_pict, message=msg)
             else:
-                self._in_progress = threads.defer_to_thread(self.fb_user.put_photo, image=fb_pict, message=msg, album_id = album)
+                self._in_progress = threads.defer_to_thread(self.fb_user.put_photo, image=fb_pict, message=msg, album_path= album)
             self._in_progress.addCallback(self.cb_picture_update)
             self._in_progress.addErrback(self.cb_picture_error)
             self._time_last_message = datetime.now()
@@ -133,4 +133,4 @@ class FacebookUser(object):
             else:
                 _log.info("Skipping duplicate picture '%s'" % picture)
         except Exception as e:
-            _log.error('Failed to post picture %s because of error: %s' % picture, e.message)
+            _log.error('Failed to post picture %s because of error: %s' % (picture, e.message))

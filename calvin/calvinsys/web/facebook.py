@@ -40,7 +40,11 @@ class Facebook(object):
         self._node = node
         self._actor = actor
 
-        credentials = self._node.attributes.get_private("/web/facebook.com")
+        try:
+            credentials = self._node.attributes.get_private("/web/facebook.com")
+        except Exception as e:
+            _log.error("Credentials not accessible. Error message %s" % e.message)
+            credentials = None
 
         if credentials:
             self._fb = FacebookUser(config=credentials)
