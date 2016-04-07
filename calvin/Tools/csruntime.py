@@ -142,6 +142,7 @@ def deploy(rt, app_info, credentials):
     from calvin.Tools import deployer
     d = {}
     try:
+        time.sleep(4)#fix for the raspberry
         d = deployer.Deployer(rt, app_info, credentials)
         d.deploy()
     except:

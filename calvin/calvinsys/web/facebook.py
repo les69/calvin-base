@@ -56,7 +56,7 @@ class Facebook(object):
     def set_credentials(self, facebook_credentials):
         if not self._fb:
             self._fb = FacebookUser(config=facebook_credentials)
-            success = True
+            success = self._fb.check_atuhentication()
         else :
             _log.warning("Credentials already supplied - ignoring")
             success = False

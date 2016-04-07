@@ -1,10 +1,10 @@
-from calvin.runtime.north.plugins.coders.integration.nest_integration import NestIntegration, NotFoundException, \
+from calvin.calvinsys.integration.nest import NestIntegration, NotFoundException, \
     LogInException
 
 import json as js
 import pytest
 from calvin.utilities.calvinlogger import get_logger
-
+from calvin.utilities.settings import NEST_CONFIG_DIR
 
 """
 run py.test test_nest.py --runslow
@@ -22,7 +22,8 @@ def absolute_filename(filename):
     return os.path.join(os.path.dirname(__file__), filename)
 
 def login():
-        json_content =open(absolute_filename('config')).read()
+        json_content =open(NEST_CONFIG_DIR).read()
+        #json_content =open(absolute_filename('config')).read()
         json = js.loads(json_content)
         nest_int = NestIntegration()
         nest_int.login(json['user'], json['pass'])
@@ -30,7 +31,7 @@ def login():
 
 @pytest.mark.slow
 def test_correct_login():
-    json_content =open(absolute_filename('config')).read()
+    json_content =open(NEST_CONFIG_DIR).read()
     json = js.loads(json_content)
     nest_int = NestIntegration()
     assert nest_int.login(json['user'], json['pass']) is True

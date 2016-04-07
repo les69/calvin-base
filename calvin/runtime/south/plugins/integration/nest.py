@@ -3,6 +3,14 @@ from calvin.utilities.calvinlogger import get_logger
 
 _log = get_logger(__name__)
 
+"""
+ATTENTION PLEASE
+THIS FILE IS OBSOLETE AND NEEDS TO BE REMOVED,
+DON'T USE IT
+
+REMINDER TO: MYSELF
+"""
+
 class LogInException(Exception):
 
     """

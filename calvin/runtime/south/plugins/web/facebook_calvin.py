@@ -1,5 +1,6 @@
 from calvin.runtime.south.plugins.async.twistedimpl import async, threads
 import facebook
+from facebook import GraphAPIError
 import json
 import ast
 from datetime import datetime
@@ -42,6 +43,16 @@ class FacebookUser(object):
         self._next_picture = None
         self.fb_user = facebook.GraphAPI(access_token=config['access_token'])
 
+    def check_atuhentication(self):
+        auth = False
+
+        try:
+            self.fb_user.put_like('-1')
+            auth = True
+        except GraphAPIError as ex:
+           if not ex.message.__contains__("Invalid OAuth access token"):
+               auth = True
+        return auth
 
     def cb_post_update(self, *args, **kwargs):
         if self._next_message:
