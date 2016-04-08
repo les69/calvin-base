@@ -18,5 +18,5 @@ class CalvinPiCamera(object):
         return open(picture).read()
 
 
-def register(node, actor):
-    return CalvinPiCamera(node, actor)
+def register(node=None, actor=None):
+    return CalvinPiCamera()

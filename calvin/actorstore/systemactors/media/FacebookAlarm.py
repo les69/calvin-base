@@ -21,8 +21,8 @@ class FacebookAlarm(Actor):
     def setup(self):
         self.timer = self['timer'].repeat(self.delay)
         self.use("calvinsys.media.image", shorthand="image")
-        self.use("'calvinsys.web.facebook'", shorthand="facebook")
-        self.use("'calvinsys.media.calvinpicamera'", shorthand="picamera")
+        self.use("calvinsys.web.facebook", shorthand="facebook")
+        self.use("calvinsys.media.calvinpicamera", shorthand="picamera")
         self.image = self["image"]
         self.picture = None
         time.sleep(self.delay)
