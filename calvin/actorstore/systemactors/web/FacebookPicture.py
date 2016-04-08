@@ -21,12 +21,14 @@ from calvin.utilities.calvinlogger import get_logger
 _log = get_logger(__name__)
 
 
-class Facebook(Actor):
+class FacebookPicture(Actor):
     """
     Post incoming tokens (text) as twitter status
-
+    example of a picture
+        {'picture' : '/home/pi/Pictures/setup.jpg',
+         'message' : 'test from calvin' }
     Input:
-      status : A string
+      picture : A JSON file with the picture absolute path and it's relative message
     """
 
     @manage([])
@@ -39,19 +41,10 @@ class Facebook(Actor):
     def setup(self):
         self.use('calvinsys.web.facebook', shorthand='facebook')
 
-    @condition(action_input=['status'])
-    def post_update(self, status):
-        msg = {'attachment': {'caption': 'caption',
-                              'description': 'description',
-                              'link': '',
-                              'name': 'hi',
-                              'picture': ''},
-               'message': 'message_thisshouldwork'}
-
-        #self['facebook'].post_update(msg)
-        pict = {'picture' : '/home/emirkomo/Pictures/setup.jpg', 'message' : 'test from calvin', 'album' :  '/test/photos'}
-        self['facebook'].post_picture(pict)
+    @condition(action_input=['picture'])
+    def post_picture(self, picture):
+        self['facebook'].post_picture(picture)
         return ActionResult()
 
-    action_priority = (post_update,)
+    action_priority = (post_picture,)
     requires = ['calvinsys.web.facebook']

@@ -12,3 +12,11 @@ class CalvinPiCamera(object):
         pict_name = 'picture-%s.jpg' % datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         self.camera.capture(pict_name)
         return pict_name
+
+    def get_picture_stream(self):
+        picture = self.get_picture()
+        return open(picture).read()
+
+
+def register(node, actor):
+    return CalvinPiCamera(node, actor)

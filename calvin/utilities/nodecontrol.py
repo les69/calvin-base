@@ -33,10 +33,11 @@ def node_control(control_uri, barrier=True):
             if barrier:
                 failed = True
                 # Try 20 times waiting for control API to be up and running
-                for i in range(20):
+                for i in range(80):
                     try:
                         self._id = self.request_handler.get_node_id(self)
                         failed = False
+                        time.sleep(0.4)
                         break
                     except:
                         time.sleep(0.1)

@@ -35,7 +35,7 @@ class FacebookAlarm(Actor):
     @guard(lambda self: self.picture)
     def detect(self):
         pict = open(self.picture)
-        found = self.image.detect_face(pict)
+        found = self.image.detect_face(pict.read())
         _log.info('From FaceDetect found = %s' % found)
 
         if found:

@@ -25,8 +25,7 @@ class FaceDetect(Actor) :
 
     @condition(['image'], ['faces'])
     def detect(self, image):
-        #found = self.image.detect_face(image)
-        found = self.image.detect_face(file.read(open(absolute_filename(image))))
+        found = self.image.detect_face(image)
         _log.info('From FaceDetect found = %s' % found)
         return ActionResult(production=(found, ))
 
