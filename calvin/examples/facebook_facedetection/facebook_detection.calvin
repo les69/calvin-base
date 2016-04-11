@@ -2,12 +2,14 @@
 source : std.Counter()
 delay : std.ClassicDelay(delay=0.5)
 output : io.Print()
+debug : io.Print()
 #msg : std.Constant(data="ok")
-#out : web.FacebookPicture()
+#facebook : web.FacebookPicture()
 pi : media.PiCamera()
 detector : media.FaceDetect()
 
 source.integer > delay.token
 delay.token > pi.trigger
-pi.image > detector.image
+pi.stream > detector.image
 detector.faces > output.token
+pi.image > debug.print

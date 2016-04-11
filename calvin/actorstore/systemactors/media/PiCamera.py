@@ -22,11 +22,13 @@ class PiCamera(Actor):
     def did_migrate(self):
         self.setup()
 
-    @condition(action_input=['trigger'], action_output=['image'])
+    @condition(action_input=['trigger'], action_output=['image', 'picture'])
     @guard(lambda self, trigger : trigger)
     def get_image(self, trigger):
-        image = self['picamera'].get_picture_stream()
-        return ActionResult(production=(image, ))
+        #image = self['picamera'].get_picture_stream()
+        image = self['picamera'].get_picture()
+        stream = open(image,'r').read()
+        return ActionResult(production=(stream, image ))
 
     @condition(action_input=['trigger'])
     def empty(self, trigger):

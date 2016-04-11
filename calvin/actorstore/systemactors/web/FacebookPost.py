@@ -46,7 +46,7 @@ class FacebookPost(Actor):
 
     @condition(action_input=['status'])
     def post_update(self, status):
-        self['facebook'].post_picture(status)
+        self['facebook'].post_update(status)
         return ActionResult()
 
     action_priority = (post_update,)

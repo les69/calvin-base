@@ -73,9 +73,9 @@ class Facebook(object):
             _log.warning("Credentials not set, cannot post")
             return
         if picture.__contains__('album'):
-            self._fb.post_picture(picture['picture'], picture['message'], picture['album'])
+            self._fb.post_picture(picture['picture'].encode('utf-8'), picture['message'].encode('utf-8'), picture['album'].encode('utf-8'))
         else:
-            self._fb.post_picture(picture['picture'], picture['message'])
+            self._fb.post_picture(picture['picture'].encode('utf-8'), picture['message'].encode('utf-8'))
 
 
 def register(node, actor):

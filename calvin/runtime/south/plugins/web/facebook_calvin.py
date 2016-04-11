@@ -111,8 +111,10 @@ class FacebookUser(object):
         self._in_progress = None
 
     def _post_picture(self, fb_picture):
+
         (pict, msg, album) = fb_picture
         if not self._in_progress:
+            #_log.info('Posting picture with name %s' % pict)
             fb_pict = open(pict, 'rb')
             if album is None:
                 self._in_progress = threads.defer_to_thread(self.fb_user.put_photo, image=fb_pict, message=msg)
@@ -127,7 +129,8 @@ class FacebookUser(object):
 
     def post_picture(self, picture, message, album = None):
         try:
-            _log.info('posting message %s' % message)
+            _log.info('posting message %s with picture %s' % (message, picture))
+
             if (picture, message, album) != self._previous_picture:
                 if self._delayed_call:
                     self._delayed_call.cancel()
