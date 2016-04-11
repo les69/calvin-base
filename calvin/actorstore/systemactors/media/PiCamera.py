@@ -9,7 +9,9 @@ class PiCamera(Actor):
     Inputs:
       trigger: binary input
     Outputs:
-      image: generated image
+      stream: image stream
+      image: generated image file
+
     """
 
     @manage([])
@@ -22,7 +24,7 @@ class PiCamera(Actor):
     def did_migrate(self):
         self.setup()
 
-    @condition(action_input=['trigger'], action_output=['image', 'picture'])
+    @condition(action_input=['trigger'], action_output=['stream', 'image'])
     @guard(lambda self, trigger : trigger)
     def get_image(self, trigger):
         #image = self['picamera'].get_picture_stream()
