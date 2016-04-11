@@ -1,8 +1,0 @@
-io : io.Print()
-msg : std.Constant(data="i am a message")
-pict : std.Constant(data="I am a picture")
-json : json.FbPictureJson()
-
-pict.token > json.picture
-msg.token > json.message
-json.json > io.token
