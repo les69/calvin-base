@@ -17,6 +17,7 @@ def absolute_filename(filename):
 class TemperatureCheck(Actor):
 
     """
+    OBSOLETE - THIS WILL BE SOON REPLACED WITH A BETTER EXAMPLE
     After first token, pass on token once every 'delay' seconds.
     Inputs:
         device: the device name
