@@ -29,6 +29,7 @@ class NestDevice(Actor):
 
     def setup(self):
         self.use('calvinsys.integration.nest', shorthand='nest')
+        #get update values each 2 seconds (it requires to renew the login, change this value carefully
         self['nest'].nest._cache_ttl = 20
 
     def did_migrate(self):

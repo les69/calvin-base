@@ -7,10 +7,10 @@ delay : std.ClassicDelay(delay=0.5)
 devid : std.Constant(data="DFF9", n=1000)
 operation : std.Constant(data="get", n=1000)
 property : std.Constant(data="temperature", n=1000)
-
 thermostat : integration.NestDevice()
 io : io.Print()
 void : std.Void()
+
 
 source.integer > delay.token
 delay.token > thermostat.trigger

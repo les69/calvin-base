@@ -8,7 +8,7 @@ The following calvinscript uses the [http://www.facebook.com](Facebok) API to po
 
 This one instead is for posting a picture
 	
-	msg : std.Constant(data={"picture" : "/home/emirkomo/Pictures/calvin2.jpg", "message" : "This is Calvin" })
+	msg : std.Constant(data={"picture" : "/pathtopicture/picture.jps", "message" : "This is Calvin" })
 	facebook : web.FacebookPicture()
 	msg.token > facebook.picture
 	
