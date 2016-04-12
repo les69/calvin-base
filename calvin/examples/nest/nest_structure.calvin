@@ -1,0 +1,8 @@
+structure : integration.NestStructure(structure_name="HomeTest")
+io : io.Print()
+source : std.Counter()
+delay : std.ClassicDelay(delay=1)
+
+source.integer > delay.token
+delay.token > structure.trigger
+structure.devices > io.token

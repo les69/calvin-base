@@ -1,12 +1,8 @@
-# Nest interaction examples #
+# Nest Device interaction example #
 
 The following calvinscript uses an actor to interact with a generic Nest Device 
 and get the current temperature from a thermostat
 
-# define devid = "DFF9"
-# define operation = "get"
-# define property = "temperature"
-# use these if you want an infinite loop
 
     source : std.Counter()
     delay : std.ClassicDelay(delay=1)
@@ -28,7 +24,22 @@ and get the current temperature from a thermostat
 
 	
 Run the script with 
-    $ csruntime --host localhost nest_actor.calvin --attr-file nest_credentials.json
+    $ csruntime --host localhost nest_device.calvin --attr-file nest_credentials.json
+
+
+# Nest Structure interaction example #
+
+    structure : integration.NestStructure(structure_name="HomeTest")
+    io : io.Print()
+    source : std.Counter()
+    delay : std.ClassicDelay(delay=1)
+    
+    source.integer > delay.token
+    delay.token > structure.trigger
+    structure.devices > io.token
+    
+Run the script with 
+    $ csruntime --host localhost nest_structure.calvin --attr-file nest_credentials.json
 
 where the file `nest_credentials.json` contains (at least)
 
