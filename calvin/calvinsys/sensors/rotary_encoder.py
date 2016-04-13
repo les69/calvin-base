@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from calvin.runtime.south.plugins.io.sensors.rotary_encoder import rotary_encoder
+from calvin.runtime.south.plugins.io.sensors.rotary_encoder.platform.ky040_rotary_impl import rotary_encoder
 
 
 class RotaryEncoder(object):

@@ -1,23 +1,17 @@
-import pickle
 import pytest
-from calvin.runtime.north.plugins.coders.integration.nest_integration import NestIntegration
+from calvin.calvinsys.integration.nest import NestIntegration
+from calvin.calvinsys.integration.tests.test_nest import NEST_CONFIG_DIR
 from calvin.utilities.calvinlogger import get_logger
 
 import json as js
 
 _log = get_logger(__name__)
 
-def absolute_filename(filename):
-    """Test helper - get absolute name of file
-    @TODO: Possibly not the best way of doing this
-    """
-    import os.path
-    return os.path.join(os.path.dirname(__file__), filename)
 
 def login():
-        json_content =open(absolute_filename('config')).read()
+        json_content =open(NEST_CONFIG_DIR).read()
         json = js.loads(json_content)
-        nest_int = NestIntegration()
+        nest_int = NestIntegration(1,2)
         nest_int.login(json['user'], json['pass'])
         return nest_int
 

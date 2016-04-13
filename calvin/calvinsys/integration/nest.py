@@ -1,5 +1,7 @@
 from calvin.runtime.north.plugins.nest import Nest
 from calvin.utilities.calvinlogger import get_logger
+from calvin.runtime.south.plugins.async.twistedimpl import async, threads
+from datetime import datetime
 
 _log = get_logger(__name__)
 
@@ -13,6 +15,8 @@ class LogInException(Exception):
 
 class NotFoundException(Exception):
 
+
+
     """
     Just a simple custom exception for the class below
     """
@@ -22,8 +26,26 @@ class NotFoundException(Exception):
 
 class NestIntegration(object):
 
-    def __init__(self):
+    def __init__(self, node, actor):
         self.nest = None
+        self._node = node
+        self._actore = actor
+
+        try:
+            credentials = self._node.attributes.get_private("/web/nest.com")
+        except Exception as e:
+            _log.error("Credentials not accessible. Error message %s" % e.message)
+            credentials = None
+
+        if credentials:
+            result = self.login(credentials['username'], credentials['password'])
+            if result:
+                _log.info("Successfully logged in into Nest.com")
+            else:
+                _log.info("Authentication failed. Check username and password")
+        else:
+            _log.warning("Expected credentials /private/web/nest.com not found")
+            self.nest = None
 
     def login(self, username, password):
         """
@@ -59,7 +81,6 @@ class NestIntegration(object):
             self.nest.structures
         except Exception:
             raise LogInException("Wrong credentials! Check username and password")
-
 
     def list_structures(self):
 
@@ -146,7 +167,19 @@ class NestIntegration(object):
         return device.__getattribute__(proprety_name)
 
     def set_property(self, deviceID, property_name, value):
+        """
+        Set the property of a device given its identifier
 
+        Args:
+            deviceID: device identifier
+            property_name: the property name to set
+            value: the value for the property to be set
+
+        Returns:
+            True if the operation succeeds
+            NotFoundException if the device name is not found
+            AttributeError if the property doesn't exists
+        """
         self.check_login()
         device = self.get_device_by_name(deviceID)
 
@@ -156,6 +189,8 @@ class NestIntegration(object):
         return True
 
 
+def register(node, actor):
+    return NestIntegration(node,actor)
 
 
 

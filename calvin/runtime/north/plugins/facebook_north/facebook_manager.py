@@ -3,8 +3,7 @@ import json
 import ast
 
 
-
-#[todo] put the function in a utils file
+#this should not be here
 def get_attribute(json_file, property):
     js_object =json.loads(open(json_file).read())
 
@@ -36,7 +35,9 @@ class FacebookPost(object):
 class FacebookUser(object):
 
     def __init__(self, config):
+        #self.fb_user = facebook.GraphAPI(access_token=config['access_token'])
         self.fb_user = facebook.GraphAPI(access_token=get_attribute(config, 'access_token'))
+
 
     def post_message(self, message, attachment):
         self.fb_user.put_wall_post(message=message, attachment=attachment)
