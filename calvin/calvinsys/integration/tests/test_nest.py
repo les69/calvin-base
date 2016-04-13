@@ -4,7 +4,19 @@ from calvin.calvinsys.integration.nest import NestIntegration, NotFoundException
 import json as js
 import pytest
 from calvin.utilities.calvinlogger import get_logger
-from calvin.utilities.settings import NEST_CONFIG_DIR
+
+"""
+Configuration file for automated testing. Change with your credentials file
+NEST_CONFIG_DIR = $PATHTO/yourcredentials.json
+
+The file has to be structured like the following
+
+{
+    "user": "<NEST EMAIL/USERNAME>",
+    "pass": "<YOUR PASSWORD>"
+}
+"""
+NEST_CONFIG_DIR = '/home/emirkomo/projects/internship/calvin-base/calvin/calvinsys/integration/tests/credentials.json'
 
 """
 run py.test test_nest.py --runslow
@@ -14,16 +26,9 @@ Cloud messing with multiple and sequential logins.
 """
 _log = get_logger(__name__)
 
-def absolute_filename(filename):
-    """Test helper - get absolute name of file
-    @TODO: Possibly not the best way of doing this
-    """
-    import os.path
-    return os.path.join(os.path.dirname(__file__), filename)
 
 def login():
         json_content =open(NEST_CONFIG_DIR).read()
-        #json_content =open(absolute_filename('config')).read()
         json = js.loads(json_content)
         nest_int = NestIntegration()
         nest_int.login(json['user'], json['pass'])
@@ -33,12 +38,12 @@ def login():
 def test_correct_login():
     json_content =open(NEST_CONFIG_DIR).read()
     json = js.loads(json_content)
-    nest_int = NestIntegration()
+    nest_int = NestIntegration(1,2)
     assert nest_int.login(json['user'], json['pass']) is True
 
 @pytest.mark.slow
 def test_wrong_login():
-    nest_int = NestIntegration()
+    nest_int = NestIntegration(1,2)
     assert nest_int.login('lol','lol') is False
 
 @pytest.mark.slow
