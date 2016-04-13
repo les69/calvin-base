@@ -1,6 +1,6 @@
 import pytest
 from calvin.calvinsys.integration.nest import NestIntegration
-from calvin.utilities.settings import NEST_CONFIG_DIR
+from calvin.calvinsys.integration.tests.test_nest import NEST_CONFIG_DIR
 from calvin.utilities.calvinlogger import get_logger
 
 import json as js
@@ -11,7 +11,7 @@ _log = get_logger(__name__)
 def login():
         json_content =open(NEST_CONFIG_DIR).read()
         json = js.loads(json_content)
-        nest_int = NestIntegration()
+        nest_int = NestIntegration(1,2)
         nest_int.login(json['user'], json['pass'])
         return nest_int
 

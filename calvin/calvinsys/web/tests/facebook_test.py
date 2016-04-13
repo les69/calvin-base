@@ -1,8 +1,19 @@
 import pytest
 import json
-from calvin.utilities.settings import FACEBOOK_CREDENTIALS
 from calvin.calvinsys.web.facebook import Facebook, FacebookUser
 from facebook import GraphAPIError
+
+"""
+Configuration file for automated testing. Change with your credentials file
+FACEBOOK_CREDENTIALS = $PATHTO/yourcredentials.json
+
+The file has to be structured like the following
+
+{
+    "access_token": "<user access token>",
+}
+"""
+FACEBOOK_CREDENTIALS = '/home/emirkomo/projects/internship/calvin-base/calvin/calvinsys/web/tests/credentials.json'
 
 
 def test_correct_credentials():
