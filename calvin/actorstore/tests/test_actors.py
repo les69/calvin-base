@@ -20,6 +20,7 @@ import argparse
 from calvin.actorstore.store import ActorStore
 from calvin.runtime.north.calvin_token import Token
 from calvin.runtime.south.endpoint import Endpoint
+from calvin.runtime.north import metering
 
 
 def fwrite(port, value):
@@ -133,6 +134,11 @@ class FDMock(object):
         self.fp.write(data + "\n")
 
 
+class StdInMock(FDMock):
+    def __init__(self):
+        self.buffer = "stdin\nstdin_second_line"
+
+
 class TimerMock(object):
 
     def __init__(self):
@@ -165,6 +171,9 @@ class CalvinSysTimerMock(object):
 class CalvinSysFileMock(object):
     def open(self, fname, mode):
         return FDMock(fname, mode)
+
+    def open_stdin(self):
+        return StdInMock()
 
     def close(self, fdmock):
         fdmock.close()
@@ -200,6 +209,8 @@ class ActorTester(object):
         self.actors = {}
         self.illegal_actors = {}
         self.components = {}
+        self.id = "ActorTester"
+        self.metering = metering.set_metering(metering.Metering(self))
 
     def collect_actors(self, actor):
         actors = [m + '.' + a for m in self.store.modules() for a in self.store.actors(m)]
