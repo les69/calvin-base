@@ -116,7 +116,6 @@ def runtime(uri, control_uri, attributes=None, dispatch=False):
         else:
             start_node(uri, control_uri, **kwargs)
     except Exception as e:
-        print "Starting runtime failed:\n%s" % e.message
         return 1
 
 def storage_runtime(uri, control_uri, attributes=None, dispatch=False):
