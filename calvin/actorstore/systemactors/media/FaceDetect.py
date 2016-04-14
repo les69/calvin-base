@@ -1,7 +1,5 @@
 from calvin.actor.actor import Actor, ActionResult, condition
-from calvin.utilities.calvinlogger import get_logger
-from calvin.utilities.utils import absolute_filename
-_log = get_logger(__name__)
+
 
 class FaceDetect(Actor) :
     """
