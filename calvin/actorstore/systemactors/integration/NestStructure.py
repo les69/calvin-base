@@ -11,39 +11,46 @@ class NestStructure(Actor):
         ... more coming!
 
     Inputs:
-        trigger: run the evaluation
+        structure_name: the structure's to analyze
+        operation: the operation input to run (list,..., more coming)
 
     Outputs:
         devices: the list of the devices available in the structure
     """
 
-    @manage(['structure_name'])
-    def init(self, structure_name):
-        self.structure_name = structure_name
-        self.trigger = None
+    @manage()
+    def init(self):
+        self.structure_name = None
+        self.operation = None
         self.setup()
 
     def setup(self):
         self.use('calvinsys.integration.nest', shorthand='nest')
-        #get update values each 2 seconds (it requires to renew the login, change this value carefully
-        self['nest'].nest._cache_ttl = 20
-        self.structure = self['nest'].get_structure_by_name(self.structure_name)
+        self.structure = None
+        self.nest = self['nest']
 
     def did_migrate(self):
         self.setup()
 
-    @condition(action_input=['trigger'], action_output=[])
-    @guard(lambda self, trigger: self.trigger is None)
-    def trigger(self, trigger):
-        self.trigger = True
+    @condition(action_input=['structure_name'], action_output=[])
+    @guard(lambda self, structure_name:self.nest is not None and self.structure is None)
+    def set_structure(self, structure_name):
+        self.structure_name = structure_name
+        self.structure = self['nest'].get_structure_by_name(self.structure_name)
+        return ActionResult()
+
+    @condition(action_input=['operation'], action_output=[])
+    @guard(lambda self, operation: self.operation is None)
+    def set_operation(self, operation):
+        self.operation = True
         return ActionResult()
 
     @condition([], ['devices'])
-    @guard(lambda self: self.structure is not None and self.trigger is True)
+    @guard(lambda self:self.nest._in_progress is None and self.structure is not None and self.operation == "list")
     def get_devices(self):
         res = self['nest'].list_devices_by_structure(self.structure_name)
-        self.trigger = None
+        self.operation = None
         return ActionResult(production=(res,))
 
-    action_priority = (trigger, get_devices)
+    action_priority = (set_structure, set_operation, get_devices)
     requires = ['calvinsys.integration.nest']
