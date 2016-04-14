@@ -25,14 +25,6 @@ def get_home():
     from os.path import expanduser
     return expanduser("~")
 
-
-def absolute_filename(file ,filename):
-    """Test helper - get absolute name of file
-    @TODO: Possibly not the best way of doing this
-    """
-    import os.path
-    return os.path.join(os.path.dirname(file), filename)
-
 def get_local_ip():
     import socket
     return [(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close())

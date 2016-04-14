@@ -12,7 +12,6 @@ class NestDevice(Actor):
         ... more coming!
 
     Inputs:
-        trigger: run the evaluation
         device: the device identifier
         operation: string representing the operation to do (get or set)
         property_name: the property to be get/set
@@ -24,13 +23,12 @@ class NestDevice(Actor):
     @manage()
     def init(self):
         self.operation = None
-        self.trigger = None
         self.setup()
 
     def setup(self):
         self.use('calvinsys.integration.nest', shorthand='nest')
-        #get update values each 2 seconds (it requires to renew the login, change this value carefully
-        self['nest'].nest._cache_ttl = 20
+        self.nest = self['nest']
+
 
     def did_migrate(self):
         self.setup()
@@ -40,26 +38,20 @@ class NestDevice(Actor):
         self.operation = operation
         return ActionResult()
 
-    @condition(action_input=['trigger'], action_output=[])
-    @guard(lambda self, trigger: self.trigger is None)
-    def trigger(self, trigger):
-        self.trigger = True
-        return ActionResult()
-
     @condition(['device', 'property_name', 'value'], [])
-    @guard(lambda self, device, property_name, value: self.operation == "set" and self.trigger is True)
+    @guard(lambda self, device, property_name, value: self.nest._in_progress is None and self.operation == "set")
     def set_property(self, device, property_name, value):
         self['nest'].set_property(device, property_name, value)
-        self.trigger = None
+        self.operation = None
         return ActionResult()
 
     @condition(['device', 'property_name'], ['result'])
-    @guard(lambda self, device, property_name: self.operation == "get" and self.trigger is True)
+    @guard(lambda self, device, property_name: self.nest._in_progress is None and self.operation == "get")
     def get_property(self, device, property_name):
         _log.info("Reading property %s from device %s" % (property_name, device))
         res = self['nest'].get_property(device, property_name)
-        self.trigger = None
+        self.operation = None
         return ActionResult(production=(res,))
 
-    action_priority = (trigger, set_operation, set_property, get_property)
+    action_priority = (set_operation, set_property, get_property)
     requires = ['calvinsys.integration.nest']

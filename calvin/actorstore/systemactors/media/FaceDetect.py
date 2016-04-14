@@ -1,7 +1,5 @@
 from calvin.actor.actor import Actor, ActionResult, condition
-from calvin.utilities.calvinlogger import get_logger
-from calvin.utilities.utils import absolute_filename
-_log = get_logger(__name__)
+
 
 class FaceDetect(Actor) :
     """
@@ -26,7 +24,6 @@ class FaceDetect(Actor) :
     @condition(['image'], ['faces'])
     def detect(self, image):
         found = self.image.detect_face(image)
-        _log.info('From FaceDetect found = %s' % found)
         return ActionResult(production=(found, ))
 
     action_priority = (detect, )

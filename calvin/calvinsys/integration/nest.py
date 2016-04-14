@@ -1,7 +1,6 @@
 from calvin.runtime.north.plugins.nest import Nest
 from calvin.utilities.calvinlogger import get_logger
 from calvin.runtime.south.plugins.async.twistedimpl import async, threads
-from datetime import datetime
 
 _log = get_logger(__name__)
 
@@ -30,7 +29,7 @@ class NestIntegration(object):
         self.nest = None
         self._node = node
         self._actore = actor
-
+        self.isLogged = None
         try:
             credentials = self._node.attributes.get_private("/web/nest.com")
         except Exception as e:
@@ -38,14 +37,30 @@ class NestIntegration(object):
             credentials = None
 
         if credentials:
-            result = self.login(credentials['username'], credentials['password'])
-            if result:
-                _log.info("Successfully logged in into Nest.com")
-            else:
-                _log.info("Authentication failed. Check username and password")
+            self._in_progress = threads.defer_to_thread(self.login,credentials['username'], credentials['password'])
+            self._in_progress.addCallback(self._post_login)
+            self._in_progress.addErrback(self._err_login)
+
         else:
             _log.warning("Expected credentials /private/web/nest.com not found")
             self.nest = None
+
+    def _post_login(self,*args, **kwargs):
+        self._in_progress = None
+        (res,) = args
+        self.isLogged = res
+
+        if self.isLogged:
+            _log.info("Successfully logged in into Nest.com")
+            #get update values each 2 seconds (it requires to renew the login, change this value carefully
+            self.nest._cache_ttl = 20
+        else:
+            _log.info("Authentication failed. Check username and password")
+
+    def _err_login(self, *args, **kwargs):
+         _log.error("%r %r" % (args, kwargs))
+         self._in_progress = None
+         self.isLogged = False
 
     def login(self, username, password):
         """
