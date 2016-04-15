@@ -1,7 +1,7 @@
 import picamera as pi
 import time
 import datetime
-from calvin.runtime.south.plugins.async.twistedimpl import  threads
+from calvin.runtime.south.plugins.async.twistedimpl import threads
 from calvin.utilities.calvinlogger import get_logger
 
 _log = get_logger(__name__)
