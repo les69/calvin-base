@@ -1,6 +1,6 @@
 from calvin.runtime.north.plugins.nest import Nest
 from calvin.utilities.calvinlogger import get_logger
-from calvin.runtime.south.plugins.async.twistedimpl import async, threads
+from calvin.runtime.south.plugins.async.twistedimpl import  threads
 
 _log = get_logger(__name__)
 
