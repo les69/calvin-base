@@ -1,4 +1,3 @@
-
 source : std.Counter()
 delay : std.ClassicDelay(delay=1.5)
 msg : std.Constant(data="Alert Message", n=10)
@@ -18,4 +17,3 @@ detector.faces > if.select
 json.json > if.data
 if.case_true > facebook.picture
 if.case_false > terminator.void
-

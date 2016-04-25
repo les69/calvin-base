@@ -30,24 +30,12 @@ class Cam(object):
     Capture image from device
     """
 
-    def __init__(self, device, width=None, height=None):
+    def __init__(self, device, width, height):
         """
         Initialize camera
         """
-        if str(device).lower() == "picamera":
-            self.camera = CalvinPiCamera()
-        else:
-            self.camera = camera.Camera(device, width, height)
 
-    def get_picture(self):
-        if not type(self.camera) == 'CalvinPiCamera':
-            raise NotSupported('This method is not supported by this device: use CalvinPiCamera instead')
-        self.camera.get_picture()
-
-    def get_picture_stream(self):
-        if not type(self.camera) == 'CalvinPiCamera':
-            raise NotSupported('This method is not supported by this device: use CalvinPiCamera instead')
-        self.camera.get_picture()
+        self.camera = camera.Camera(device, width, height)
 
     def get_image(self):
         """
@@ -66,6 +54,8 @@ class Cam(object):
 class CameraHandler(object):
 
     def open(self, device, width, height):
+        if device == 'picamera':
+            return CalvinPiCamera()
         return Cam(device, width, height)
 
     def close(self, camera):

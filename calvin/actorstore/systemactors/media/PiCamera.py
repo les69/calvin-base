@@ -21,18 +21,23 @@ class PiCamera(Actor):
         self.setup()
 
     def setup(self):
-        self.use("calvinsys.media.calvinpicamera", shorthand="picamera")
-        self.camera = self['picamera']
+        self.use("calvinsys.media.camerahandler", shorthand="camera")
+        self.camera = self["camera"].open('picamera', None, None)
         self.image = None
 
     def did_migrate(self):
         self.setup()
 
+    def will_end(self):
+        self.camera.close()
+
+    def will_migrate(self):
+        self.camera.close()
+
     @condition(action_input=[], action_output=['stream', 'image'])
     @guard(lambda self: self.image and self.camera.picture_taken)
     def get_image(self):
         _log.info('Opening stream and returning image')
-        _log.info('is taken from picamera %s' % self.camera.picture_taken)
         stream = open(self.image, 'r').read()
         image = self.image
         self.image = None
@@ -42,9 +47,9 @@ class PiCamera(Actor):
     @guard(lambda self, trigger : trigger and not self.image)
     def take_picture(self, trigger):
         _log.info('Taking picture from PiCamera')
-        self.image = self['picamera'].get_picture()
+        self.image = self.camera.get_picture()
         return ActionResult()
 
 
     action_priority = (take_picture, get_image)
-    requires =  ["calvinsys.media.calvinpicamera"]
+    requires =  ["calvinsys.media.camerahandler"]
