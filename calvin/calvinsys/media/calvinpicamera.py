@@ -21,6 +21,14 @@ class CalvinPiCamera(object):
         _log.error('%s %s' % (args, kwargs))
         self._in_progress = None
 
+    def get_image(self):
+        """
+        Wrapper for standardizing names with previous calvin camera implementations
+        Returns:
+            a stream of the picture taken
+
+        """
+        return self.get_picture_stream()
 
     def get_picture(self):
         self.picture_taken = False
@@ -33,6 +41,9 @@ class CalvinPiCamera(object):
     def get_picture_stream(self):
         picture = self.get_picture()
         return open(picture).read()
+
+    def close(self):
+        self.camera.close()
 
 
 def register(node=None, actor=None):
