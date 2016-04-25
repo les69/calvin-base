@@ -44,7 +44,7 @@ class PiCamera(Actor):
         return ActionResult(production=(stream, image))
 
     @condition(action_input=['trigger'], action_output=[])
-    @guard(lambda self, trigger : trigger and not self.image)
+    @guard(lambda self, trigger: trigger and not self.image)
     def take_picture(self, trigger):
         _log.info('Taking picture from PiCamera')
         self.image = self.camera.get_picture()
