@@ -1,5 +1,7 @@
 from calvin.actor.actor import Actor, ActionResult, manage, condition, guard
+from calvin.utilities.calvinlogger import get_logger
 
+_log = get_logger(__name__)
 
 class PiCamera(Actor):
 
@@ -27,16 +29,19 @@ class PiCamera(Actor):
         self.setup()
 
     @condition(action_input=[], action_output=['stream', 'image'])
-    @guard(lambda self: self.image is not None and self.camera.picture_taken is True)
+    @guard(lambda self: self.image and self.camera.picture_taken)
     def get_image(self):
+        _log.info('Opening stream and returning image')
+        _log.info('is taken from picamera %s' % self.camera.picture_taken)
         stream = open(self.image, 'r').read()
         image = self.image
         self.image = None
         return ActionResult(production=(stream, image))
 
     @condition(action_input=['trigger'], action_output=[])
-    @guard(lambda self, trigger : trigger)
+    @guard(lambda self, trigger : trigger and not self.image)
     def take_picture(self, trigger):
+        _log.info('Taking picture from PiCamera')
         self.image = self['picamera'].get_picture()
         return ActionResult()
 

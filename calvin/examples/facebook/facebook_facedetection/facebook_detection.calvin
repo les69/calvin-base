@@ -1,7 +1,7 @@
 
 source : std.Counter()
-delay : std.ClassicDelay(delay=0.5)
-msg : std.Constant(data="Alert Message")
+delay : std.ClassicDelay(delay=1.5)
+msg : std.Constant(data="Alert Message", n=10)
 facebook : web.FacebookPicture()
 pi : media.PiCamera()
 detector : media.FaceDetect()
