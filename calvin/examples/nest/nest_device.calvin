@@ -3,7 +3,7 @@
 #define property = "temperature"
 
 source : std.Counter()
-delay : std.ClassicDelay(delay=0.5)
+delay : std.ClassicDelay(delay=1)
 const : std.Constantify(constant="get")
 devid : std.Constant(data="DFF9", n=1000)
 #operation : std.Constant(data="get", n=1000)

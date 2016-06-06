@@ -1,0 +1,17 @@
+define model = "Mirko"
+source : std.Counter()
+delay : std.ClassicDelay(delay=1.5)
+io: io.Print()
+test: mlearning.speaker_recognition.TestRec()
+ml : mlearning.speaker_recognition.SpeakerVerification()
+terminator: std.Terminator()
+void : std.Void()
+
+source.integer > delay.token
+delay.token > test.token
+#test.file > terminator.void
+test.file > ml.wav
+model > ml.model
+void.void > ml.operation
+ml.match > terminator.void
+ml.likelihood > io.token

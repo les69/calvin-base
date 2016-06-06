@@ -1,0 +1,3 @@
+define url = "http://localhost:5000/homekit/Office/test"
+http : net.HTTPGet()
+io: io.Print()

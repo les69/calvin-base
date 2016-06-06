@@ -1,5 +1,6 @@
 from calvin.actor.actor import Actor, ActionResult, manage, condition, guard
 from calvin.utilities.calvinlogger import get_logger
+import time
 
 _log = get_logger(__name__)
 
@@ -23,6 +24,7 @@ class NestDevice(Actor):
     @manage()
     def init(self):
         self.operation = None
+        self.time_start = None
         self.setup()
 
     def setup(self):
@@ -36,6 +38,7 @@ class NestDevice(Actor):
     @condition(action_input=['operation'], action_output=[])
     def set_operation(self, operation):
         self.operation = operation
+        self.time_start = time.time()
         return ActionResult()
 
     @condition(['device', 'property_name', 'value'], [])
@@ -43,6 +46,8 @@ class NestDevice(Actor):
     def set_property(self, device, property_name, value):
         self['nest'].set_property(device, property_name, value)
         self.operation = None
+        endtime = time.time()
+        _log.info("Execution time: {0} ms\n".format((endtime - self.time_start) * 1000))
         return ActionResult()
 
     @condition(['device', 'property_name'], ['result'])
@@ -51,6 +56,8 @@ class NestDevice(Actor):
         _log.info("Reading property %s from device %s" % (property_name, device))
         res = self['nest'].get_property(device, property_name)
         self.operation = None
+        endtime = time.time()
+        _log.info("Execution time: {0} ms\n".format((endtime - self.time_start) * 1000))
         return ActionResult(production=(res,))
 
     action_priority = (set_operation, set_property, get_property)
