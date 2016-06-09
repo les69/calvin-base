@@ -1,0 +1,10 @@
+source : std.Counter()
+delay : std.ClassicDelay(delay=1.5)
+io: io.Print()
+ml : mlearning.speaker_recognition.SpeechToText()
+test : mlearning.speaker_recognition.TestFileConst()
+
+source.integer > delay.token
+delay.token > test.token
+test.file > ml.audio
+ml.text > io.token

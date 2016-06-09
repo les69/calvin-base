@@ -7,7 +7,7 @@ import json
 
 _log = get_logger(__name__)
 
-#[TODO] rename in speaker identification
+#[TODO] implement model insertion
 class SpeakerVerification(Actor):
 
     """

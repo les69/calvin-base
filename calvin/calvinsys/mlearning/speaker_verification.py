@@ -30,9 +30,7 @@ class SpeakerVerification(object):
             raise Exception("File nor supported")
 
         if self._in_progress is None:
-            _log.info("Deferring to threead")
             self._in_progress = threads.defer_to_thread(self._verify_identity, model_name=model, file_path=file)
-            _log.info("Deferring completed")
             self._in_progress.addCallback(self.cb_post_verify_identity)
             self._in_progress.addErrback(self.cb_error_verify_identity)
         else:

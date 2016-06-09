@@ -5,7 +5,7 @@ import json
 _log = get_logger(__name__)
 
 
-class TestRec(Actor):
+class TestFileConst(Actor):
 
     """
     Get contents of URL
@@ -13,8 +13,7 @@ class TestRec(Actor):
     Input:
       token : token
     Output:
-      file: JSON dictionary
-      file_path: path to the fil
+      file: path to file
     """
     @manage()
     def init(self):
@@ -33,13 +32,11 @@ class TestRec(Actor):
 
     @condition(action_output=['file'])
     @guard(lambda self: self.token is not None)
-    def read_file(self):
-        file = open('mirko-3.wav')
-        encoded_string = base64.b64encode(file.read())
-
-        js = json.dumps({'base64_string' : encoded_string})
+    def file_string(self):
+        file_path = "/Users/les/Virtualenvs/calvin/calvin-base/mirko-4.wav"
         self.token = None
-        return ActionResult(production=(js, ))
+        return ActionResult(production=(file_path, ))
 
 
-    action_priority = (start, read_file)
+
+    action_priority = (start, file_string)
