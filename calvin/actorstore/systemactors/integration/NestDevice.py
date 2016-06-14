@@ -25,10 +25,11 @@ class NestDevice(Actor):
     def init(self):
         self.operation = None
         self.time_start = None
+        self.started = None
         self.setup()
 
     def setup(self):
-        self.use('calvinsys.integration.nest', shorthand='nest')
+        self.use('calvinsys.integration.nest_async', shorthand='nest')
         self.nest = self['nest']
 
 
@@ -38,7 +39,6 @@ class NestDevice(Actor):
     @condition(action_input=['operation'], action_output=[])
     def set_operation(self, operation):
         self.operation = operation
-        self.time_start = time.time()
         return ActionResult()
 
     @condition(['device', 'property_name', 'value'], [])
@@ -46,19 +46,26 @@ class NestDevice(Actor):
     def set_property(self, device, property_name, value):
         self['nest'].set_property(device, property_name, value)
         self.operation = None
-        endtime = time.time()
-        _log.info("Execution time: {0} ms\n".format((endtime - self.time_start) * 1000))
         return ActionResult()
 
-    @condition(['device', 'property_name'], ['result'])
-    @guard(lambda self, device, property_name: self.nest._in_progress is None and self.operation == "get")
+    @condition(['device', 'property_name'], [])
+    @guard(lambda self, device, property_name: self.operation == "get" and self.started is None)
     def get_property(self, device, property_name):
         _log.info("Reading property %s from device %s" % (property_name, device))
-        res = self['nest'].get_property(device, property_name)
+        self['nest'].get_property(device, property_name)
         self.operation = None
-        endtime = time.time()
-        _log.info("Execution time: {0} ms\n".format((endtime - self.time_start) * 1000))
+        self.started = True
+        return ActionResult()
+
+    @condition(action_output=['result'])
+    @guard(lambda self, device, property_name: self['nest']._in_progress is None and self.operation == "get" and self.data is not None)
+    def return_value(self):
+        res = self['nest'].data
         return ActionResult(production=(res,))
+
+
+
+
 
     action_priority = (set_operation, set_property, get_property)
     requires = ['calvinsys.integration.nest']

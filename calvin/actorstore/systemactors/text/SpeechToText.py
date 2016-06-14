@@ -6,7 +6,7 @@ _log = get_logger(__name__)
 class SpeechToText(Actor):
 
     """
-    Verify who is speaking in a wav file (recommended frequency 48 kHz)
+    Convert into text the content of an audio file
 
     Input:
       audio : audio filepath

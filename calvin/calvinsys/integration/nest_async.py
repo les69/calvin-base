@@ -1,29 +1,12 @@
+from calvin.calvinsys.integration.nest import LogInException, NotFoundException
 from calvin.runtime.north.plugins.nest import Nest
 from calvin.utilities.calvinlogger import get_logger
 from calvin.runtime.south.plugins.async.twistedimpl import  threads
 
 _log = get_logger(__name__)
 
-class LogInException(Exception):
 
-    """
-    Just a simple custom exception for the class below
-    """
-    def __init__(self, message):
-        self.message = message
-
-class NotFoundException(Exception):
-
-
-
-    """
-    Just a simple custom exception for the class below
-    """
-    def __init__(self, message):
-        self.message = message
-
-
-class NestIntegration(object):
+class NestIntegrationAsync(object):
 
     def __init__(self, node, actor):
         self.nest = None
@@ -31,6 +14,7 @@ class NestIntegration(object):
         self._actore = actor
         self.isLogged = None
         self.data = None
+        self._in_progress = None
 
         try:
             credentials = self._node.attributes.get_private("/web/nest.com")
@@ -99,28 +83,44 @@ class NestIntegration(object):
         except Exception:
             raise LogInException("Wrong credentials! Check username and password")
 
+    def err_callback(self, *args, **kwargs):
+        self._in_progress = None
+
+    def post_callback(self, *args, **kwargs):
+        self._in_progress = None
+
+
+    def _lift_structures(self):
+        self.check_login()
+        self.data = self.nest.structures
+
     def list_structures(self):
 
-        """
-        Lists all structures owned by the current user
-        Returns: a list of structures
+        if not self._in_progress:
+            self.data = None
+            self._in_progress = threads.defer_to_thread(self._lift_structures)
+            self._in_progress.addErrback(self.err_callback)
+            self._in_progress.addCallback(self.post_callback())
 
-        """
-        self.check_login()
-        return self.nest.structures
+        else:
+            _log.info("Task is already busy")
 
-    def list_devices(self):
+    def _list_devices(self):
 
-        """
-        Lists all devices owned by the current user
-        Returns: a list of structures
-
-        """
         self.check_login()
         complete_list = [self.nest.devices, self.nest.protectdevices, self.nest.cameradevices]
-        return reduce(lambda first,second: first + second, complete_list)
+        self.data = reduce(lambda first,second: first + second, complete_list)
 
-    def list_devices_by_structure(self, structure_name):
+    def list_devices(self):
+        if not self._in_progress:
+            self.data = None
+            self._in_progress = threads.defer_to_thread(self._list_devices)
+            self._in_progress.addErrback(self.err_callback)
+            self._in_progress.addCallback(self.post_callback())
+        else:
+            _log.info("Task is already busy")
+
+    def _list_devices_by_structure(self, structure_name):
 
         """
         Lists the devices in the given structure
@@ -136,10 +136,19 @@ class NestIntegration(object):
         if structure is None:
             raise NotFoundException("Structure with %s name does not exist" % structure_name)
         complete_list = [structure.devices, structure.protectdevices, structure.cameradevices]
-        return reduce(lambda first,second: first + second, complete_list)
+        self.data = reduce(lambda first,second: first + second, complete_list)
+
+    def list_devices_by_structure(self, structure_name):
+        if not self._in_progress:
+            self.data = None
+            self._in_progress = threads.defer_to_thread(self._list_devices_by_structure, structure_name = structure_name)
+            self._in_progress.addErrback(self.err_callback)
+            self._in_progress.addCallback(self.post_callback())
+        else:
+            _log.info("Task is already busy")
 
 
-    def get_structure_by_name(self, structure_name):
+    def _get_structure_by_name(self, structure_name):
 
         """
         Args:
@@ -150,9 +159,18 @@ class NestIntegration(object):
         """
         self.check_login()
         res = filter(lambda item: item.name == structure_name, self.nest.structures)
-        return next(iter(res), None)
+        self.data = next(iter(res), None)
 
-    def get_device_by_name(self,deviceID):
+    def get_structure_by_name(self, structure_name):
+        if not self._in_progress:
+            self.data = None
+            self._in_progress = threads.defer_to_thread(self._get_structure_by_name, structure_name = structure_name)
+            self._in_progress.addErrback(self.err_callback)
+            self._in_progress.addCallback(self.post_callback())
+        else:
+            _log.info("Task is already busy")
+
+    def _get_device_by_name(self,deviceID):
 
         """
         Lookup with a device given its name
@@ -164,15 +182,24 @@ class NestIntegration(object):
         """
         self.check_login()
         res = filter(lambda device: device.name == deviceID, self.nest.devices)
-        return next(iter(res), None)
+        self.data = next(iter(res), None)
 
-    def get_property(self,deviceID, proprety_name):
+    def get_device_by_name(self, deviceID):
+        if not self._in_progress:
+            self.data = None
+            self._in_progress = threads.defer_to_thread(self._get_device_by_name, deviceID = deviceID)
+            self._in_progress.addErrback(self.err_callback)
+            self._in_progress.addCallback(self.post_callback())
+        else:
+            _log.info("Task is already busy")
+
+    def _get_property(self, deviceID, property_name):
 
         """
         read property device given property and device names
         Args:
             deviceID:
-            proprety_name:
+            property_name:
 
         Returns: the value of that property or raise an exception otherwise
 
@@ -182,9 +209,19 @@ class NestIntegration(object):
 
         if device is None:
             raise NotFoundException("Device with %s name does not exist!" % deviceID)
-        device.__getattribute__(proprety_name)
+        self.data = device.__getattribute__(property_name)
 
-    def set_property(self, deviceID, property_name, value):
+    def get_property(self, deviceID, property_name):
+        if not self._in_progress:
+            self.data = None
+            self._in_progress = threads.defer_to_thread(self._get_property, deviceID = deviceID, property_name = property_name)
+            self._in_progress.addErrback(self.err_callback)
+            self._in_progress.addCallback(self.post_callback())
+        else:
+            _log.info("Task is already busy")
+
+
+    def _set_property(self, deviceID, property_name, value):
         """
         Set the property of a device given its identifier
 
@@ -204,11 +241,20 @@ class NestIntegration(object):
         if device is None:
             raise NotFoundException("Device with %s name does not exist!" % deviceID)
         device.__setattr__(property_name, value)
-        return True
+        self.data = True
+
+    def set_property(self, deviceID, property_name, value):
+        if not self._in_progress:
+            self.data = None
+            self._in_progress = threads.defer_to_thread(self._set_property, deviceID = deviceID, proprety_name = property_name, value = value)
+            self._in_progress.addErrback(self.err_callback)
+            self._in_progress.addCallback(self.post_callback())
+        else:
+            _log.info("Task is already busy")
 
 
 def register(node, actor):
-    return NestIntegration(node,actor)
+    return NestIntegrationAsync(node,actor)
 
 
 
